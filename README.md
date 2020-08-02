@@ -7,4 +7,8 @@ This is a repository for sample applications used in the following article.
 
 ## NOTICE
 
-These sample applications listen to 8080/tcp. If you use them on the same node, you have to modify listening port for one sample application.
+- These sample applications listen to 8080/tcp. If you use them on the same node, you have to modify listening port for one sample application.
+- The environment variable "MP_URL" should be set before invoking Helidon SE sample application.
+  - If the environment variable is not specified, Helidon SE sample application throws exception since this environment variable is used to call an API hosted on Helidon MP sample application.
+  - This environment variable is used in specifiGreetingService.java.
+  - This execption is described in "unhandled exception" in the passage listed above.
