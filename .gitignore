@@ -1,0 +1,3 @@
+# Project exclude paths
+/helidon-quickstart-mp/target/
+/helidon-quickstart-se/target/
