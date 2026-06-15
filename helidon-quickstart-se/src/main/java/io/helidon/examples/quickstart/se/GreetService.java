@@ -89,6 +89,12 @@ public class GreetService implements HttpService {
                     .add("error", "Invalid JSON")
                     .build();
             serverResponse.status(Status.INTERNAL_SERVER_ERROR_500).send(jsonErrorObject);
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.WARNING, "MP service request failed", e);
+            JsonObject jsonErrorObject = JSON.createObjectBuilder()
+                    .add("error", "MP service request failed")
+                    .build();
+            serverResponse.status(Status.BAD_GATEWAY_502).send(jsonErrorObject);
         }
     }
 
