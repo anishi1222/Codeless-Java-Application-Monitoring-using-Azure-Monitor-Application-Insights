@@ -84,7 +84,11 @@ public class GreetService implements HttpService {
             JsonObject jsonObj = reader.readObject();
             sendResponse(serverResponse, jsonObj.getString("message"));
         } catch (JsonException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Invalid JSON response from MP service", e);
+            JsonObject jsonErrorObject = JSON.createObjectBuilder()
+                    .add("error", "Invalid JSON")
+                    .build();
+            serverResponse.status(Status.INTERNAL_SERVER_ERROR_500).send(jsonErrorObject);
         }
     }
 
@@ -118,7 +122,7 @@ public class GreetService implements HttpService {
 
     private static <T> T processErrors(Throwable ex, ServerRequest request, ServerResponse response) {
 
-         if (ex.getCause() instanceof JsonException){
+         if (ex instanceof JsonException || ex.getCause() instanceof JsonException){
 
             LOGGER.log(Level.FINE, "Invalid JSON", ex);
             JsonObject jsonErrorObject = JSON.createObjectBuilder()
