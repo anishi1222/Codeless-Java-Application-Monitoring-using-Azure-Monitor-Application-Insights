@@ -122,7 +122,7 @@ public class GreetService implements HttpService {
 
     private static <T> T processErrors(Throwable ex, ServerRequest request, ServerResponse response) {
 
-         if (ex instanceof JsonException || ex.getCause() instanceof JsonException){
+         if (isJsonException(ex)){
 
             LOGGER.log(Level.FINE, "Invalid JSON", ex);
             JsonObject jsonErrorObject = JSON.createObjectBuilder()
@@ -139,6 +139,17 @@ public class GreetService implements HttpService {
         }
 
         return null;
+    }
+
+    private static boolean isJsonException(Throwable ex) {
+        Throwable current = ex;
+        while (current != null) {
+            if (current instanceof JsonException) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private void updateGreetingFromJson(JsonObject jo, ServerResponse response) {
