@@ -1,6 +1,8 @@
 
 # 1st stage, build the app
-FROM helidon/jdk11-graalvm-maven:21.3.0 as build
+FROM ghcr.io/graalvm/native-image-community:25 AS build
+
+RUN microdnf install -y maven && microdnf clean all
 
 WORKDIR /helidon
 
