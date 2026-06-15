@@ -3,21 +3,24 @@ package io.helidon.examples.quickstart.se;
 
 import java.io.StringReader;
 import java.util.Collections;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.json.*;
-
-import io.helidon.common.http.Http;
-import io.helidon.common.reactive.Single;
 import io.helidon.config.Config;
-import io.helidon.webclient.WebClient;
-import io.helidon.webserver.Routing;
-import io.helidon.webserver.ServerRequest;
-import io.helidon.webserver.ServerResponse;
-import io.helidon.webserver.Service;
+import io.helidon.http.Status;
+import io.helidon.service.registry.Services;
+import io.helidon.webclient.api.WebClient;
+import io.helidon.webserver.http.HttpRules;
+import io.helidon.webserver.http.HttpService;
+import io.helidon.webserver.http.ServerRequest;
+import io.helidon.webserver.http.ServerResponse;
+
+import jakarta.json.Json;
+import jakarta.json.JsonBuilderFactory;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 
 /**
  * A simple service to greet you. Examples:
@@ -34,7 +37,7 @@ import io.helidon.webserver.Service;
  * The message is returned as a JSON object
  */
 
-public class GreetService implements Service {
+public class GreetService implements HttpService {
 
     /**
      * The config value for the key {@code greeting}.
@@ -45,8 +48,12 @@ public class GreetService implements Service {
 
     private static final Logger LOGGER = Logger.getLogger(GreetService.class.getName());
 
-    GreetService(Config config) {
-        greeting.set(config.get("app.greeting").asString().orElse("Ciao"));
+    GreetService() {
+        this(Services.get(Config.class).get("app"));
+    }
+
+    GreetService(Config appConfig) {
+        greeting.set(appConfig.get("greeting").asString().orElse("Ciao"));
     }
 
     /**
@@ -54,7 +61,7 @@ public class GreetService implements Service {
      * @param rules the routing rules.
      */
     @Override
-    public void update(Routing.Rules rules) {
+    public void routing(HttpRules rules) {
         rules
             .get("/", this::getDefaultMessageHandler)
             .get("/greet2mp/{name}", this::get2MPMessageHandler)
@@ -71,12 +78,12 @@ public class GreetService implements Service {
         WebClient client = WebClient.builder()
                 .baseUri(mpUrl)
                 .build();
-        String name = serverRequest.path().param("name");
-        Single<String> response = client.get().path("/greet/" + name).request(String.class);
-        try (JsonReader reader = Json.createReader(new StringReader(response.get()))) {
+        String name = serverRequest.path().pathParameters().get("name");
+        String response = client.get("/greet/" + name).requestEntity(String.class);
+        try (JsonReader reader = Json.createReader(new StringReader(response))) {
             JsonObject jsonObj = reader.readObject();
             sendResponse(serverResponse, jsonObj.getString("message"));
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (JsonException e) {
             e.printStackTrace();
         }
     }
@@ -96,7 +103,7 @@ public class GreetService implements Service {
      * @param response the server response
      */
     private void getMessageHandler(ServerRequest request, ServerResponse response) {
-        String name = request.path().param("name");
+        String name = request.path().pathParameters().get("name");
         sendResponse(response, name);
     }
 
@@ -117,14 +124,14 @@ public class GreetService implements Service {
             JsonObject jsonErrorObject = JSON.createObjectBuilder()
                 .add("error", "Invalid JSON")
                 .build();
-            response.status(Http.Status.BAD_REQUEST_400).send(jsonErrorObject);
+            response.status(Status.BAD_REQUEST_400).send(jsonErrorObject);
         }  else {
 
             LOGGER.log(Level.FINE, "Internal error", ex);
             JsonObject jsonErrorObject = JSON.createObjectBuilder()
                 .add("error", "Internal error")
                 .build();
-            response.status(Http.Status.INTERNAL_SERVER_ERROR_500).send(jsonErrorObject);
+            response.status(Status.INTERNAL_SERVER_ERROR_500).send(jsonErrorObject);
         }
 
         return null;
@@ -135,13 +142,13 @@ public class GreetService implements Service {
             JsonObject jsonErrorObject = JSON.createObjectBuilder()
                     .add("error", "No greeting provided")
                     .build();
-            response.status(Http.Status.BAD_REQUEST_400)
+            response.status(Status.BAD_REQUEST_400)
                     .send(jsonErrorObject);
             return;
         }
 
         greeting.set(jo.getString("greeting"));
-        response.status(Http.Status.NO_CONTENT_204).send();
+        response.status(Status.NO_CONTENT_204).send();
     }
 
     /**
@@ -151,8 +158,10 @@ public class GreetService implements Service {
      */
     private void updateGreetingHandler(ServerRequest request,
                                        ServerResponse response) {
-        request.content().as(JsonObject.class)
-            .thenAccept(jo -> updateGreetingFromJson(jo, response))
-            .exceptionally(ex -> processErrors(ex, request, response));
+        try {
+            updateGreetingFromJson(request.content().as(JsonObject.class), response);
+        } catch (RuntimeException ex) {
+            processErrors(ex, request, response);
+        }
     }
 }
