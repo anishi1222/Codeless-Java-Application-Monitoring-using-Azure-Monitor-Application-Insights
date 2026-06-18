@@ -11,7 +11,7 @@ The samples are based on:
 Use these apps to validate how Application Insights captures telemetry (requests, dependencies, failures, and performance) **without changing application code for instrumentation**.
 
 - The Java agent is attached at runtime using `-javaagent:applicationinsights-agent.jar`.
-- Dockerfiles download the agent from the official `microsoft/ApplicationInsights-Java` releases.
+- Dockerfiles download the agent from releases published in the official GitHub repository `microsoft/ApplicationInsights-Java`.
 
 ## Repository structure
 
