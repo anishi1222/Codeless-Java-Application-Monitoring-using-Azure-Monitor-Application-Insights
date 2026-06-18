@@ -1,0 +1,54 @@
+# Maven / Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+dependency-reduced-pom.xml
+release.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+*.releaseBackup
+*.versionsBackup
+buildNumber.properties
+.mvn/timing.properties
+
+# Native image / packaged application outputs
+build/
+out/
+bin/
+
+# Logs and runtime diagnostics
+logs/
+*.log
+hs_err_pid*
+replay_pid*
+.attach_pid*
+*.hprof
+*.jfr
+*.pid
+*.pid.lock
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Azure Application Insights local agent downloads
+applicationinsights-agent-*.jar
+
+# IDE metadata
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
