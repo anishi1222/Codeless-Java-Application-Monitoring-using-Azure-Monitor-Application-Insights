@@ -1,0 +1,39 @@
+# Maven / Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+dependency-reduced-pom.xml
+
+# Native image / packaged application outputs
+build/
+out/
+bin/
+
+# Logs and runtime diagnostics
+logs/
+*.log
+hs_err_pid*
+replay_pid*
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Azure Application Insights local agent downloads
+applicationinsights-agent-*.jar
+
+# IDE metadata
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
