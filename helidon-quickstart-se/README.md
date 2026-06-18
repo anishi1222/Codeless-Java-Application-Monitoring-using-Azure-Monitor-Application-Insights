@@ -78,7 +78,7 @@ docker build -t helidon-quickstart-se .
 ```
 docker run --rm -p 8080:8080 \
   -e "APPLICATIONINSIGHTS_CONNECTION_STRING=<your-connection-string>" \
-  -e "MP_URL=http://<mp-host>:8080" \
+  -e "MP_URL=http://<mp-host>:8081" \
   helidon-quickstart-se:latest
 ```
 
