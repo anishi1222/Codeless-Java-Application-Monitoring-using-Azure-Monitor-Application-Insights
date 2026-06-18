@@ -1,15 +1,25 @@
 # Codeless Java Application Monitoring using Azure Monitor Application Insights
 
-This is a repository for sample applications used in the following article.
+This repository contains sample Helidon applications for demonstrating codeless Java monitoring with Azure Monitor Application Insights.
 
-- English Edition : https://medium.com/@Logico_jp/codeless-java-application-monitoring-using-azure-monitor-application-insights-5f05b339dd87
-- Japanese edition : https://logico-jp.io/2020/04/16/monitor-java-applications-via-java-agent-newly-introduced-to-azure-monitor-application-insights/
+## Related articles
 
-## NOTICE
+- English edition: https://medium.com/@Logico_jp/codeless-java-application-monitoring-using-azure-monitor-application-insights-5f05b339dd87
+- Japanese edition: https://logico-jp.io/2020/04/16/monitor-java-applications-via-java-agent-newly-introduced-to-azure-monitor-application-insights/
 
-- These sample applications listen to 8080/tcp. If you use them on the same node, you have to modify listening port for one sample application.
-- The environment variable "MP_URL" should be set before invoking Helidon SE sample application.
-  - If the environment variable is not specified, Helidon SE sample application throws exception since this environment variable is used to call an API hosted on Helidon MP sample application.
-  - This environment variable is used in specific to GreetingService.java.
-  - This exception is described in "unhandled exception" in the passage listed above.
-- ARG "version" in each Dockerfile stands for Application Insights agent version. The default is 3.7.8; specify it manually in Dockerfile or with --build-arg when creating images.
+## Repository contents
+
+- `/helidon-quickstart-mp` - Helidon MP sample application
+- `/helidon-quickstart-se` - Helidon SE sample application
+
+Each sample includes its own `README.md` with build, run, Docker, and Kubernetes instructions.
+
+## Important notes
+
+- Both sample applications listen on port `8080`. If you run them on the same host at the same time, change the port for one of them.
+- Set the `MP_URL` environment variable before starting the Helidon SE sample.
+  - The SE sample uses this value when calling the Helidon MP sample from `GreetService.java`.
+  - If `MP_URL` is missing, the SE sample can fail when the cross-service call is invoked.
+- Each Dockerfile uses the build argument `version` for the Application Insights Java agent version.
+  - The default value is `3.7.8`.
+  - You can change it directly in the Dockerfile or override it with `docker build --build-arg version=<agent-version>`.
