@@ -1,13 +1,27 @@
 # Helidon Quickstart SE
 
-Sample Helidon SE project that includes multiple REST operations.
+Sample Helidon SE project that includes multiple REST operations. This application is used to demonstrate codeless Java monitoring with [Azure Monitor Application Insights](https://learn.microsoft.com/azure/azure-monitor/app/java-standalone-telemetry-processors).
+
+## Prerequisites
+
+- JDK 25+
+- Maven 3.x
+- The `MP_URL` environment variable must be set to the base URL of the running Helidon MP service (e.g., `http://localhost:8081`) before starting this application. It is required by the `/greet/greet2mp/{name}` endpoint, which proxies requests to the MP service. If `MP_URL` is not set, that endpoint will throw an exception at runtime.
 
 ## Build and run
 
-With JDK 25+
 ```bash
+export MP_URL=http://localhost:8081
 mvn package
 java -jar target/helidon-quickstart-se.jar
+```
+
+To enable monitoring with the Application Insights Java agent, download the agent jar and set the connection string:
+
+```bash
+export MP_URL=http://localhost:8081
+export APPLICATIONINSIGHTS_CONNECTION_STRING=<your-connection-string>
+java -javaagent:/path/to/applicationinsights-agent.jar -jar target/helidon-quickstart-se.jar
 ```
 
 ## Exercise the application
@@ -23,6 +37,13 @@ curl -X PUT -H "Content-Type: application/json" -d '{"greeting" : "Hola"}' http:
 
 curl -X GET http://localhost:8080/greet/Jose
 {"message":"Hola Jose!"}
+```
+
+The `/greet/greet2mp/{name}` endpoint proxies the request to the Helidon MP service (requires `MP_URL` to be set):
+
+```
+curl -X GET http://localhost:8080/greet/greet2mp/Joe
+{"message":"Hello Joe!"}
 ```
 
 ## Try health and metrics
@@ -46,6 +67,8 @@ curl -H 'Accept: application/json' -X GET http://localhost:8080/observe/metrics
 
 ## Build the Docker Image
 
+The Docker image bundles the Application Insights Java agent. Set `APPLICATIONINSIGHTS_CONNECTION_STRING` and `MP_URL` when running the container.
+
 ```
 docker build -t helidon-quickstart-se .
 ```
@@ -53,10 +76,13 @@ docker build -t helidon-quickstart-se .
 ## Start the application with Docker
 
 ```
-docker run --rm -p 8080:8080 helidon-quickstart-se:latest
+docker run --rm -p 8080:8080 \
+  -e "APPLICATIONINSIGHTS_CONNECTION_STRING=<your-connection-string>" \
+  -e "MP_URL=http://<mp-host>:8080" \
+  helidon-quickstart-se:latest
 ```
 
-Exercise the application as described above
+Exercise the application as described above.
 
 ## Deploy the application to Kubernetes
 
@@ -71,104 +97,8 @@ kubectl get service helidon-quickstart-se   # Get service info
 Note the PORTs. You can now exercise the application as you did before but use the second
 port number (the NodePort) instead of 8080.
 
-After you’re done, cleanup.
+After you're done, cleanup.
 
 ```
 kubectl delete -f app.yaml
-```
-
-## Build a native image with GraalVM
-
-GraalVM allows you to compile your programs ahead-of-time into a native
- executable. See https://www.graalvm.org/docs/reference-manual/aot-compilation/
- for more information.
-
-You can build a native executable in 2 different ways:
-* With a local installation of GraalVM
-* Using Docker
-
-### Local build
-
-Download GraalVM for JDK 25 at https://www.graalvm.org/downloads.
-
-```
-# Setup the environment
-export GRAALVM_HOME=/path
-# build the native executable
-mvn package -Pnative-image
-```
-
-You can also put the Graal VM `bin` directory in your PATH, or pass
- `-DgraalVMHome=/path` to the Maven command.
-
-See https://github.com/oracle/helidon-build-tools/tree/master/helidon-maven-plugin#goal-native-image
- for more information.
-
-Start the application:
-
-```
-./target/helidon-quickstart-se
-```
-
-### Multi-stage Docker build
-
-Build the "native" Docker Image
-
-```
-docker build -t helidon-quickstart-se-native -f Dockerfile.native .
-```
-
-Start the application:
-
-```
-docker run --rm -p 8080:8080 helidon-quickstart-se-native:latest
-```
-
-## Build a Java Runtime Image using jlink
-
-You can build a custom Java Runtime Image (JRI) containing the application jars and the JDK modules
-on which they depend. This image also:
-
-* Enables Class Data Sharing by default to reduce startup time.
-* Contains a customized `start` script to simplify CDS usage and support debug and test modes.
-
-You can build a custom JRI in two different ways:
-* Local
-* Using Docker
-
-
-### Local build
-
-```
-# build the JRI
-mvn package -Pjlink-image
-```
-
-See https://github.com/oracle/helidon-build-tools/tree/master/helidon-maven-plugin#goal-jlink-image
- for more information.
-
-Start the application:
-
-```
-./target/helidon-quickstart-se-jri/bin/start
-```
-
-### Multi-stage Docker build
-
-Build the JRI as a Docker Image
-
-```
-docker build -t helidon-quickstart-se-jri -f Dockerfile.jlink .
-```
-
-Start the application:
-
-```
-docker run --rm -p 8080:8080 helidon-quickstart-se-jri:latest
-```
-
-See the start script help:
-
-```
-docker run --rm helidon-quickstart-se-jri:latest --help
 ```
