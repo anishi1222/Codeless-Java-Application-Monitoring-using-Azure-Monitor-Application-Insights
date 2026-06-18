@@ -1,9 +1,9 @@
 # When executing this docker image, environment variable DEFAULT_APP_ARGS, MP_URL, and APPLICATIONINSIGHTS_CONNECTION_STRING should be specified.
-# --build-arg DEFAULT_APP_ARGS=javaagent:applicationinsights-agent-3.2.2.jar
+# --build-arg DEFAULT_APP_ARGS=javaagent:applicationinsights-agent-3.7.8.jar
 # --build-arg APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=...
 
 # 1st stage, build the app
-FROM maven:3.8.3-openjdk-17-slim as build
+FROM maven:3.9.11-eclipse-temurin-25 as build
 
 WORKDIR /helidon
 
@@ -20,7 +20,7 @@ RUN mvn -Ddocker.build=true package -Pjlink-image -DskipTests
 RUN echo "done!"
 
 # 2nd stage, build the final image with the JRI built in the 1st stage
-FROM debian:stretch-slim
+FROM debian:bookworm-slim
 WORKDIR /helidon
 COPY --from=build /helidon/target/helidon-quickstart-mp-jri ./
 ENTRYPOINT ["/bin/bash", "/helidon/bin/start"]

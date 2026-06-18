@@ -12,4 +12,4 @@ This is a repository for sample applications used in the following article.
   - If the environment variable is not specified, Helidon SE sample application throws exception since this environment variable is used to call an API hosted on Helidon MP sample application.
   - This environment variable is used in specific to GreetingService.java.
   - This exception is described in "unhandled exception" in the passage listed above.
-- ARG "version" in each Dockerfile stands for Application Insights agent version. You should specify it manually in Dockerfile or specify with --build-arg when creating images.
+- ARG "version" in each Dockerfile stands for Application Insights agent version. The default is 3.7.8; specify it manually in Dockerfile or with --build-arg when creating images.

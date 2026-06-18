@@ -4,7 +4,7 @@ Sample Helidon SE project that includes multiple REST operations.
 
 ## Build and run
 
-With JDK11+
+With JDK 25+
 ```bash
 mvn package
 java -jar target/helidon-quickstart-se.jar
@@ -28,17 +28,17 @@ curl -X GET http://localhost:8080/greet/Jose
 ## Try health and metrics
 
 ```
-curl -s -X GET http://localhost:8080/health
+curl -s -X GET http://localhost:8080/observe/health
 {"outcome":"UP",...
 . . .
 
 # Prometheus Format
-curl -s -X GET http://localhost:8080/metrics
+curl -s -X GET http://localhost:8080/observe/metrics
 # TYPE base:gc_g1_young_generation_count gauge
 . . .
 
 # JSON Format
-curl -H 'Accept: application/json' -X GET http://localhost:8080/metrics
+curl -H 'Accept: application/json' -X GET http://localhost:8080/observe/metrics
 {"base":...
 . . .
 
@@ -89,8 +89,7 @@ You can build a native executable in 2 different ways:
 
 ### Local build
 
-Download Graal VM at https://www.graalvm.org/downloads, the versions
- currently supported for Helidon are `20.1.0` and above.
+Download GraalVM for JDK 25 at https://www.graalvm.org/downloads.
 
 ```
 # Setup the environment

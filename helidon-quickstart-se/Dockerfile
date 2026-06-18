@@ -2,7 +2,7 @@
 # -e "APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=..." -e "MP_URL=..."
 
 # 1st stage, build the app
-FROM maven:3.8.3-openjdk-17-slim as build
+FROM maven:3.9.11-eclipse-temurin-25 as build
 
 WORKDIR /helidon
 
@@ -20,8 +20,8 @@ RUN mvn package -DskipTests
 RUN echo "done!"
 
 # 2nd stage, build the runtime image
-FROM openjdk:17.0.1-jdk-slim
-ARG version="3.2.2"
+FROM eclipse-temurin:25-jre
+ARG version="3.7.8"
 WORKDIR /helidon
 
 # Copy the binary built in the 1st stage

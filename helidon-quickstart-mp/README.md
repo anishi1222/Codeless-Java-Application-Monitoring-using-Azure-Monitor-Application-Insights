@@ -4,7 +4,7 @@ Sample Helidon MP project that includes multiple REST operations.
 
 ## Build and run
 
-With JDK11+
+With JDK 25+
 ```bash
 mvn package
 java -jar target/helidon-quickstart-mp.jar
@@ -89,8 +89,7 @@ You can build a native executable in 2 different ways:
 
 ### Local build
 
-Download Graal VM at https://www.graalvm.org/downloads, the version
- currently supported for Helidon is `20.1.0`.
+Download GraalVM for JDK 25 at https://www.graalvm.org/downloads.
 
 ```
 # Setup the environment
